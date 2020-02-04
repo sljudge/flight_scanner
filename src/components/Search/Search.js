@@ -1,8 +1,8 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { StyleSheet, css } from 'aphrodite'
-import { submitSearch } from '../../actions/search'
+import { submitSearch, onInputChange, onListSelect, onDateChange } from '../../actions/search'
 
 const styles = StyleSheet.create({
     searchContainer: {
@@ -43,6 +43,18 @@ const styles = StyleSheet.create({
         padding: '1rem',
         backgroundColor: 'rgba(256,256,256, 0.3)',
     },
+    dateInput: {
+        width: '8.5rem',
+        fontSize: '0.75rem'
+    },
+    textInput: {
+        width: '15rem',
+        height: '2rem',
+        fontWeight: '100',
+        backgroundColor: 'rgba(256,256,256,0.9)',
+        color: '#1e1e1e',
+        letterSpacing: '0.1rem',
+    },
     section: {
         display: "flex"
     },
@@ -50,6 +62,7 @@ const styles = StyleSheet.create({
         padding: '1rem 2rem 1rem 2rem',
         backgroundColor: 'rgba(58,174,89,0.5)',
         borderRadius: '3px',
+        cursor: 'pointer',
         ':hover': {
             backgroundColor: 'rgba(58,174,89,1)',
             fontWeight: '700',
@@ -61,11 +74,35 @@ const styles = StyleSheet.create({
         fontSize: '1.5rem',
         marginRight: '0.5rem'
     },
-
+    dropDown: {
+        position: "absolute",
+        width: '15rem',
+        padding: '0',
+        margin: '0',
+        listStyleType: 'none',
+        fontSize: '1rem',
+        backgroundColor: 'rgba(256,256,256,0.8)',
+        color: '#1e1e1e'
+    },
+    dropDownItem: {
+        padding: '0.25rem',
+        cursor: 'pointer',
+        ':hover': {
+            backgroundColor: 'rgba(30,30,30,0.5)',
+            color: 'whitesmoke'
+        }
+    }
 })
 
 const Search = props => {
-    const { submitSearch } = { ...props }
+    const { submitSearch, onInputChange, onDateChange, fromList, toList, fromInput, toInput, onListSelect } = { ...props }
+    const fromFocus = useRef()
+    const toFocus = useRef()
+    const listItemFocus = useRef()
+
+    const handleKeyDown = (e) => {
+    }
+
     return (
         <div className={css(styles.searchContainer)}>
             <div className={css(styles.searchBar)}>
@@ -73,25 +110,47 @@ const Search = props => {
                     <div className={css(styles.section)}>
                         <div className={css(styles.icon)}><i className="fas fa-plane-departure"></i></div>
                         <div>From:
-                            <div><input></input></div>
+                            <div>
+                                <input className={css(styles.textInput)} onChange={(e) => onInputChange('fromInput', e.target.value)} ref={fromFocus} value={fromInput} onKeyDown={(e) => handleKeyDown(e)} />
+                            </div>
+                            {fromList.length > 0 && fromFocus.current === document.activeElement &&
+                                <ul className={css(styles.dropDown)} >
+                                    {fromList.map(item => (
+                                        <li ref={listItemFocus} className={css(styles.dropDownItem)} key={item.id} onClick={() => onListSelect(item.name, item.id, 'fromInput')}>
+                                            {item.name} ({item.code})
+                                        </li>
+                                    ))}
+                                </ul>
+                            }
                         </div>
                     </div>
                     <div className={css(styles.section)}>
                         <div className={css(styles.icon)}><i className="fas fa-plane-arrival"></i></div>
                         <div>To:
-                            <div><input></input></div>
+                            <div>
+                                <input className={css(styles.textInput)} onChange={(e) => onInputChange('toInput', e.target.value)} ref={toFocus} value={toInput} onKeyDown={(e) => handleKeyDown(e)} />
+                            </div>
+                            {toList.length > 0 && toFocus.current === document.activeElement &&
+                                <ul className={css(styles.dropDown)} onKeyPress={(e) => console.log(e.charCode)}>
+                                    {toList.map(item => (
+                                        <li ref={listItemFocus} className={css(styles.dropDownItem)} key={item.id} onClick={() => onListSelect(item.name, item.id, 'toInput')}>
+                                            {item.name} ({item.code})
+                                        </li>
+                                    ))}
+                                </ul>
+                            }
                         </div>
                     </div>
                     <div className={css(styles.section)}>
                         <div className={css(styles.icon)}><i className="fas fa-calendar-alt"></i></div>
                         <div>Depart:
-                            <div><input type='date' /></div>
+                            <div><input className={css(styles.dateInput)} type='date' onChange={(e) => onDateChange('departDate', e.target.value)} /></div>
                         </div>
                     </div>
                     <div className={css(styles.section)}>
                         <div className={css(styles.icon)}><i className="fas fa-calendar-alt"></i></div>
                         <div>Return:
-                            <div><input type='date' /></div>
+                            <div><input className={css(styles.dateInput)} type='date' onChange={(e) => { console.log('date change'); onDateChange('returnDate', e.target.value) }} /></div>
                         </div>
                     </div>
 
@@ -106,12 +165,18 @@ const Search = props => {
 
 const mapStateToProps = (state) => {
     return {
-        search: state.search
+        fromList: state.search.fromList,
+        toList: state.search.toList,
+        fromInput: state.search.fromInput,
+        toInput: state.search.toInput,
     }
 }
 const mapActionsToProps = (dispatch, props) => {
     return bindActionCreators({
-        submitSearch
+        submitSearch,
+        onInputChange,
+        onListSelect,
+        onDateChange
     }, dispatch)
 }
 const mergeProps = (propsFromState, propsFromDispatch, ownProps) => {

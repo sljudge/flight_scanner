@@ -55,7 +55,8 @@ const Flight = props => {
         countryTo,
         price,
         availability,
-        routes
+        routes,
+        airlines
     } = { ...props }
 
     const convertTime = (timeInMillis) => (DateTime.fromMillis(timeInMillis * 1000).toFormat('hh:mm'))
@@ -92,12 +93,11 @@ const Flight = props => {
             <table className={css(styles.table, styles.providerInfo)}>
                 <tbody>
                     <tr>
-                        <td>{availability.seats !== null ? `${availability.seats} seats left` : ''}</td>
+                        <td>{airlines.name}</td>
                     </tr>
                     <tr>
-                        <td>{routes[0].length === 2 ? 'Direct' : routes[0]}</td>
+                        <td>{availability.seats !== null ? `${availability.seats} seats left` : ''}</td>
                     </tr>
-
                 </tbody>
             </table>
         </div>

@@ -1,12 +1,14 @@
 import {
     UPDATE_RESULTS,
     SUBMIT_SEARCH,
-    SET_ROTATE_FOR_SPINNER
+    SET_ROTATE_FOR_SPINNER,
+    SET_AIRLINES
 } from '../actions/search'
-
+import { airportIATAs, airlineIATAs } from '../assets'
 
 const initialState = {
     flights: [],
+    airlines: airlineIATAs,
     loading: {
         isLoading: null,
         rotate: 0

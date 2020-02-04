@@ -18,27 +18,31 @@ const styles = StyleSheet.create({
 })
 
 const Results = props => {
-    const { loading, flights } = { ...props }
+    const { loading, flights, airlines } = { ...props }
+
     return (
         <div className={css(styles.container)}>
             {loading === true && <LoadingResults />}
             {loading === false &&
-                flights.map(x => (
-                    <Flight
-                        key={x.id}
-                        dTime={x.dTime}
-                        aTime={x.aTime}
-                        flyFrom={x.flightFrom}
-                        flyTo={x.flightTo}
-                        cityFrom={x.cityFrom}
-                        cityTo={x.cityTo}
-                        countryFrom={x.countryFrom.code}
-                        countryTo={x.countryTo.code}
-                        price={x.price}
-                        availability={x.availability}
-                        routes={x.routes}
-                    />
-                ))
+                flights.map(x => {
+                    return (
+                        < Flight
+                            key={x.id}
+                            dTime={x.dTime}
+                            aTime={x.aTime}
+                            flyFrom={x.flyFrom}
+                            flyTo={x.flyTo}
+                            cityFrom={x.cityFrom}
+                            cityTo={x.cityTo}
+                            countryFrom={x.countryFrom.code}
+                            countryTo={x.countryTo.code}
+                            price={x.price}
+                            availability={x.availability}
+                            routes={x.routes}
+                            airlines={airlines[x.airlines[0]]}
+                        />
+                    )
+                })
             }
         </div>
     )
@@ -47,12 +51,12 @@ const Results = props => {
 const mapStateToProps = (state) => {
     return {
         loading: state.results.loading.isLoading,
-        flights: state.results.flights
+        flights: state.results.flights,
+        airlines: state.results.airlines
     }
 }
 const mapActionsToProps = (dispatch, props) => {
     return bindActionCreators({
-
     }, dispatch)
 }
 const mergeProps = (propsFromState, propsFromDispatch, ownProps) => {
